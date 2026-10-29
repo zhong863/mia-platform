@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 import {
   Layout, Menu, Typography, Button, Space, Tooltip, Modal, Avatar, Dropdown,
 } from 'antd'
@@ -47,6 +47,7 @@ export default function DashboardLayout() {
   const [activePanel, setActivePanel] = useState('attack:llm_scaling_collection')
   const [guideOpen, setGuideOpen] = useState(false)
   const [restoredRun, setRestoredRun] = useState(null)
+  const attackConfigCache = useRef(new Map())
 
   const siderW = collapsed ? SIDER_COLLAPSED : sidebarWidth
 
@@ -196,7 +197,7 @@ export default function DashboardLayout() {
     if (activePanel.startsWith('attack:')) {
       const attackId = activePanel.replace('attack:', '')
       const initialRun = restoredRun?.attack_id === attackId ? restoredRun : null
-      return <AttackPanel key={`${attackId}:${initialRun?.id || 'new'}`} attackId={attackId} initialRun={initialRun} />
+      return <AttackPanel key={`${attackId}:${initialRun?.id || 'new'}`} attackId={attackId} initialRun={initialRun} configCache={attackConfigCache} />
     }
     switch (activePanel) {
       case 'panel:project_overview':
@@ -207,7 +208,7 @@ export default function DashboardLayout() {
       case 'panel:upload_dataset': return <UploadDatasetPanel />
       case 'panel:launch_attack': return <LaunchAttackPanel />
       case 'panel:user': return <UserPanel />
-      default: return <AttackPanel attackId="llm_scaling_collection" />
+      default: return <AttackPanel attackId="llm_scaling_collection" configCache={attackConfigCache} />
     }
   }
 
