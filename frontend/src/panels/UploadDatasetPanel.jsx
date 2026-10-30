@@ -21,8 +21,8 @@ export default function UploadDatasetPanel() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadDone, setUploadDone] = useState(false)
 
-  const cardBg = isDark ? '#1e1e2e' : '#ffffff'
-  const cardBorder = isDark ? '#313244' : '#e8e8e8'
+  const cardBg = isDark ? '#1d1d1f' : '#ffffff'
+  const cardBorder = isDark ? '#3a3a3c' : '#e8e8e8'
   const cc = isDark ? 'float-card-dark' : 'float-card'
 
   const handleUpload = () => {

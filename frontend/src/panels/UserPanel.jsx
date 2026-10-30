@@ -13,13 +13,13 @@ export default function UserPanel() {
   const { lang } = useContext(LangContext)
   const { isDark } = useContext(ThemeContext)
 
-  const cardBg = isDark ? '#1e1e2e' : '#ffffff'
-  const cardBorder = isDark ? '#313244' : '#e8e8e8'
+  const cardBg = isDark ? '#1d1d1f' : '#ffffff'
+  const cardBorder = isDark ? '#3a3a3c' : '#e8e8e8'
 
   return (
     <div style={{ maxWidth: 700 }}>
       <Space align="center" size={12} style={{ marginBottom: 24 }}>
-        <UserOutlined style={{ fontSize: 28, color: '#4f46e5' }} />
+        <UserOutlined style={{ fontSize: 28, color: '#0067b8' }} />
         <Title level={3} style={{ margin: 0 }}>
           {lang === 'zh' ? '用户中心' : 'User Center'}
         </Title>
@@ -27,7 +27,7 @@ export default function UserPanel() {
 
       <Card style={{ background: cardBg, borderColor: cardBorder, marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24, gap: 16 }}>
-          <Avatar size={72} icon={<UserOutlined />} style={{ background: '#4f46e5' }} />
+          <Avatar size={72} icon={<UserOutlined />} style={{ background: '#0067b8' }} />
           <div>
             <Title level={4} style={{ margin: 0 }}>Demo User</Title>
             <Tag color="blue">{lang === 'zh' ? '标准用户' : 'Standard User'}</Tag>

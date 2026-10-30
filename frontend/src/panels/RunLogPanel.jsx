@@ -84,7 +84,7 @@ export default function RunLogPanel({ onOpenRun }) {
       width: 138,
       render: (value) => (
         <Space size={6}>
-          <ClockCircleOutlined style={{ color: '#8b5cf6' }} />
+          <ClockCircleOutlined style={{ color: '#4ca1ff' }} />
           <span>{formatTimestamp(value, lang)}</span>
         </Space>
       ),
@@ -143,8 +143,8 @@ export default function RunLogPanel({ onOpenRun }) {
   ]
 
   const cardStyle = {
-    background: isDark ? '#1e1e2e' : '#fff',
-    borderColor: isDark ? '#313244' : '#e8e8e8',
+    background: isDark ? '#1d1d1f' : '#fff',
+    borderColor: isDark ? '#3a3a3c' : '#e8e8e8',
   }
 
   return (
@@ -152,7 +152,7 @@ export default function RunLogPanel({ onOpenRun }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 22 }}>
         <div>
           <Space size={10} align="center">
-            <HistoryOutlined style={{ fontSize: 27, color: '#6366f1' }} />
+            <HistoryOutlined style={{ fontSize: 27, color: '#0067b8' }} />
             <Title level={3} style={{ margin: 0 }}>
               {lang === 'zh' ? '实验日志' : 'Experiment History'}
             </Title>

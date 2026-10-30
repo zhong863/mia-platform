@@ -41,8 +41,8 @@ export default function LaunchAttackPanel() {
     ? attacks.filter((a) => a.category === selectedModelObj.type)
     : []
 
-  const cardBg = isDark ? '#1e1e2e' : '#ffffff'
-  const cardBorder = isDark ? '#313244' : '#e8e8e8'
+  const cardBg = isDark ? '#1d1d1f' : '#ffffff'
+  const cardBorder = isDark ? '#3a3a3c' : '#e8e8e8'
   const cc = isDark ? 'float-card-dark' : 'float-card'
 
   const handleLaunch = () => {
@@ -66,7 +66,7 @@ export default function LaunchAttackPanel() {
   return (
     <div style={{ maxWidth: 900 }}>
       <Space align="center" size={12} style={{ marginBottom: 24 }}>
-        <RocketOutlined style={{ fontSize: 28, color: '#8b5cf6' }} />
+        <RocketOutlined style={{ fontSize: 28, color: '#4ca1ff' }} />
         <Title level={3} style={{ margin: 0 }}>{t(lang, 'launchDetectionTitle')}</Title>
       </Space>
       <Paragraph type="secondary" style={{ marginBottom: 24 }}>
@@ -178,7 +178,7 @@ export default function LaunchAttackPanel() {
         disabled={!selectedModel || !selectedDataset || !selectedAttack}
         block
         size="large"
-        style={{ height: 50, fontSize: 16, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
+        style={{ height: 50, fontSize: 16 }}
       >
         {running 
           ? (lang === 'zh' ? '检测进行中...' : 'Detection in progress...')

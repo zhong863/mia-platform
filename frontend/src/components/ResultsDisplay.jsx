@@ -25,8 +25,8 @@ const { Panel } = Collapse
 
 const CHART_MARGIN = { top: 10, right: 24, bottom: 28, left: 48 }
 const PALETTE = [
-  '#6366f1', '#10b981', '#f59e0b', '#ef4444',
-  '#06b6d4', '#8b5cf6', '#84cc16',
+  '#0067b8', '#10b981', '#f59e0b', '#ef4444',
+  '#06b6d4', '#4ca1ff', '#84cc16',
 ]
 
 // Some legacy attacks provide Chinese chart metadata from the backend. Keep the
@@ -55,8 +55,8 @@ function localizeResultText(value, lang) {
 const METRIC_CARDS = [
   {
     key: 'auc', label: 'AUC', icon: <ThunderboltOutlined />,
-    color: '#6366f1',
-    bg: 'linear-gradient(135deg,rgba(99,102,241,.12),rgba(99,102,241,.04))',
+    color: '#0067b8',
+    bg: 'linear-gradient(135deg,rgba(0,103,184,.12),rgba(0,103,184,.04))',
     precision: 4, suffix: '',
   },
   {
@@ -85,14 +85,14 @@ const METRIC_CARDS = [
   },
   {
     key: 'p_value', label: 'p-value', icon: <FunctionOutlined />,
-    color: '#8b5cf6',
-    bg: 'linear-gradient(135deg,rgba(139,92,246,.12),rgba(139,92,246,.04))',
+    color: '#4ca1ff',
+    bg: 'linear-gradient(135deg,rgba(76,161,255,.12),rgba(76,161,255,.04))',
     precision: null, suffix: '', // 特殊格式，见 formatMetricValue
   },
   {
     key: 'mean_p', label: 'Mean p-value', icon: <PercentageOutlined />,
-    color: '#6366f1',
-    bg: 'linear-gradient(135deg,rgba(99,102,241,.12),rgba(99,102,241,.04))',
+    color: '#0067b8',
+    bg: 'linear-gradient(135deg,rgba(0,103,184,.12),rgba(0,103,184,.04))',
     precision: 4, suffix: '',
   },
   {
@@ -109,8 +109,8 @@ const METRIC_CARDS = [
   },
   {
     key: 'brier_score', label: 'Brier Score', icon: <PercentageOutlined />,
-    color: '#8b5cf6',
-    bg: 'linear-gradient(135deg,rgba(139,92,246,.12),rgba(139,92,246,.04))',
+    color: '#4ca1ff',
+    bg: 'linear-gradient(135deg,rgba(76,161,255,.12),rgba(76,161,255,.04))',
     precision: 4, suffix: '',
   },
   {
@@ -132,12 +132,12 @@ export default function ResultsDisplay({ result, isDark, lang }) {
 
   const cc = isDark ? 'float-card-dark' : 'float-card'
   const cardStyle = {
-    background: isDark ? '#1e1e2e' : '#fff',
-    borderColor: isDark ? '#313244' : '#e8e8e8',
+    background: isDark ? '#1d1d1f' : '#fff',
+    borderColor: isDark ? '#3a3a3c' : '#e8e8e8',
   }
-  const gridColor = isDark ? '#313244' : '#e8e8e8'
-  const subText = isDark ? '#6c7086' : '#999'
-  const textC = isDark ? '#cdd6f4' : '#333'
+  const gridColor = isDark ? '#3a3a3c' : '#e8e8e8'
+  const subText = isDark ? '#8e8e93' : '#999'
+  const textC = isDark ? '#f5f5f7' : '#333'
   const tooltipStyle = {
     background: cardStyle.background,
     border: `1px solid ${cardStyle.borderColor}`,
@@ -352,7 +352,7 @@ function ConclusionCard({ conclusion, metrics, theme }) {
         </Col>
         <Col xs={24} md={16}>
           <Title level={5} style={{ color: textC, marginBottom: 8 }}>
-            <QuestionCircleOutlined style={{ marginRight: 8, color: '#6366f1' }} />
+            <QuestionCircleOutlined style={{ marginRight: 8, color: '#0067b8' }} />
             {lang === 'zh' ? '结果解读' : 'Result Interpretation'}
           </Title>
           {extra?.selected_attack && (
@@ -370,7 +370,7 @@ function ConclusionCard({ conclusion, metrics, theme }) {
           <Paragraph style={{ color: textC, marginBottom: 12, lineHeight: 1.7 }}>
             {conclusion.text}
           </Paragraph>
-          <Paragraph style={{ color: '#6366f1', marginBottom: 0, fontSize: 13 }}>
+          <Paragraph style={{ color: '#0067b8', marginBottom: 0, fontSize: 13 }}>
             💡 {conclusion.suggestion}
           </Paragraph>
         </Col>
@@ -573,11 +573,11 @@ function RocChart({ chart, theme }) {
             labelFormatter={(v) => `FPR: ${Number(v).toFixed(4)}`}
             formatter={(v) => [Number(v).toFixed(4), 'TPR']} />
           <ReferenceLine segment={[{ x: 0, y: 0 }, { x: 1, y: 1 }]} stroke={subText} strokeDasharray="5 5" />
-          <Line type="monotone" dataKey="tpr" stroke="#6366f1" dot={false} strokeWidth={2} name="ROC" />
+          <Line type="monotone" dataKey="tpr" stroke="#0067b8" dot={false} strokeWidth={2} name="ROC" />
           <Legend verticalAlign="top" align="right" wrapperStyle={{ paddingBottom: 4 }}
             payload={[
               { value: 'Random (0.5)', type: 'line', color: subText },
-              { value: 'ROC Curve', type: 'line', color: '#6366f1' },
+              { value: 'ROC Curve', type: 'line', color: '#0067b8' },
             ]}
             formatter={(v) => <span style={{ color: textC, fontSize: 11 }}>{v}</span>} />
         </LineChart>
@@ -693,7 +693,7 @@ function LineChartCard({ chart, theme }) {
           <Line
             type="monotone"
             dataKey="y"
-            stroke="#8b5cf6"
+            stroke="#4ca1ff"
             dot={false}
             strokeWidth={2}
             name={seriesLabel}
@@ -1084,8 +1084,8 @@ function TokenProbHeatmap({ chart, theme }) {
           </div>
           <div style={{
             display: 'flex', flexWrap: 'wrap', gap: 2, padding: '8px 12px',
-            background: theme.isDark ? '#11111b' : '#f8f9fa',
-            borderRadius: 6, border: `1px solid ${theme.isDark ? '#313244' : '#e8e8e8'}`,
+            background: theme.isDark ? '#000000' : '#f8f9fa',
+            borderRadius: 6, border: `1px solid ${theme.isDark ? '#3a3a3c' : '#e8e8e8'}`,
           }}>
             {sample.token_texts.slice(0, sample.all_prob.length).map((token, tIdx) => {
               const prob = sample.all_prob?.[tIdx] ?? 0
@@ -1160,7 +1160,7 @@ function ContinuationCompare({ chart, theme }) {
       style={{ ...cardStyle, marginBottom: 20 }}
       title={
         <Space>
-          <ThunderboltOutlined style={{ color: '#6366f1' }} />
+          <ThunderboltOutlined style={{ color: '#0067b8' }} />
           <span style={{ fontSize: 14 }}>
             {lang === 'zh' ? '逐词续写对比' : chart.title || 'Continuation Comparison'}
           </span>
@@ -1201,7 +1201,7 @@ function ContinuationCompare({ chart, theme }) {
               <Text style={{ fontSize: 11, color: subText, fontWeight: 600 }}>
                 {lang === 'zh' ? '▸ 前缀输入:' : '▸ Prefix:'}
               </Text>
-              <div style={{ padding: '4px 8px', background: theme.isDark ? '#181825' : '#eef2ff', borderRadius: 4, marginTop: 2 }}>
+              <div style={{ padding: '4px 8px', background: theme.isDark ? '#2c2c2e' : '#eef6fd', borderRadius: 4, marginTop: 2 }}>
                 <Text style={{ fontSize: 12, fontFamily: 'monospace', color: textC }}>
                   {(cont.prefix_tokens || []).join(' ')}
                 </Text>
@@ -1215,7 +1215,7 @@ function ContinuationCompare({ chart, theme }) {
                 <Text style={{ fontSize: 11, color: subText, fontWeight: 600 }}>
                   {lang === 'zh' ? '▸ 模型续写:' : '▸ Model Output:'}
                 </Text>
-                <div style={{ padding: '4px 8px', background: theme.isDark ? '#181825' : '#fef3c7', borderRadius: 4, marginTop: 2 }}>
+                <div style={{ padding: '4px 8px', background: theme.isDark ? '#2c2c2e' : '#fef3c7', borderRadius: 4, marginTop: 2 }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                     {(cont.generated_tokens || []).map((tok, tIdx) => {
                       const matched = cont.match_mask?.[tIdx] === 1
@@ -1239,7 +1239,7 @@ function ContinuationCompare({ chart, theme }) {
                 <Text style={{ fontSize: 11, color: subText, fontWeight: 600 }}>
                   {lang === 'zh' ? '▸ 实际原文:' : '▸ Actual Text:'}
                 </Text>
-                <div style={{ padding: '4px 8px', background: theme.isDark ? '#181825' : '#e0f2fe', borderRadius: 4, marginTop: 2 }}>
+                <div style={{ padding: '4px 8px', background: theme.isDark ? '#2c2c2e' : '#e0f2fe', borderRadius: 4, marginTop: 2 }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                     {(cont.actual_tokens || []).map((tok, tIdx) => {
                       const matched = cont.match_mask?.[tIdx] === 1
@@ -1261,7 +1261,7 @@ function ContinuationCompare({ chart, theme }) {
 
             {/* 匹配率进度条 */}
             <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ flex: 1, height: 6, borderRadius: 3, background: theme.isDark ? '#313244' : '#e5e7eb', overflow: 'hidden' }}>
+              <div style={{ flex: 1, height: 6, borderRadius: 3, background: theme.isDark ? '#3a3a3c' : '#e5e7eb', overflow: 'hidden' }}>
                 <div style={{
                   height: '100%', borderRadius: 3,
                   width: `${matchRate * 100}%`,
@@ -1348,11 +1348,11 @@ function CalibrationChart({ chart, theme }) {
             formatter={(v, name) => [Number(v).toFixed(4), name === 'mean_true' ? (lang === 'zh' ? '实际比例' : 'Actual') : (lang === 'zh' ? '预测概率' : 'Predicted')]}
           />
           <ReferenceLine segment={[{ x: 0, y: 0 }, { x: 1, y: 1 }]} stroke={subText} strokeDasharray="5 5" />
-          <Line type="monotone" dataKey="mean_true" stroke="#6366f1" strokeWidth={2} dot={{ r: 4, fill: '#6366f1' }} name={lang === 'zh' ? '实际比例' : 'Actual'} />
+          <Line type="monotone" dataKey="mean_true" stroke="#0067b8" strokeWidth={2} dot={{ r: 4, fill: '#0067b8' }} name={lang === 'zh' ? '实际比例' : 'Actual'} />
           <Legend verticalAlign="top" align="right" wrapperStyle={{ paddingBottom: 4 }}
             payload={[
               { value: lang === 'zh' ? '完美校准' : 'Perfect', type: 'line', color: subText },
-              { value: lang === 'zh' ? '实际比例' : 'Actual', type: 'line', color: '#6366f1' },
+              { value: lang === 'zh' ? '实际比例' : 'Actual', type: 'line', color: '#0067b8' },
             ]}
             formatter={(v) => <span style={{ color: textC, fontSize: 11 }}>{v}</span>} />
         </LineChart>
@@ -1611,7 +1611,7 @@ function LeakQACard({ chart, theme }) {
       style={{ ...cardStyle, marginBottom: 20 }}
       title={
         <Space>
-          <RobotOutlined style={{ color: '#6366f1' }} />
+          <RobotOutlined style={{ color: '#0067b8' }} />
           <span style={{ fontSize: 16 }}>{chart.title || 'Leakage'}</span>
         </Space>
       }

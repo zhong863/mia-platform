@@ -21,8 +21,8 @@ export default function UploadModelPanel() {
   const [uploading, setUploading] = useState(false)
   const [uploadDone, setUploadDone] = useState(false)
 
-  const cardBg = isDark ? '#1e1e2e' : '#ffffff'
-  const cardBorder = isDark ? '#313244' : '#e8e8e8'
+  const cardBg = isDark ? '#1d1d1f' : '#ffffff'
+  const cardBorder = isDark ? '#3a3a3c' : '#e8e8e8'
   const cc = isDark ? 'float-card-dark' : 'float-card'
 
   const handleUpload = () => {
@@ -37,7 +37,7 @@ export default function UploadModelPanel() {
   return (
     <div style={{ maxWidth: 800 }}>
       <Space align="center" size={12} style={{ marginBottom: 24 }}>
-        <ApiOutlined style={{ fontSize: 28, color: '#6366f1' }} />
+        <ApiOutlined style={{ fontSize: 28, color: '#0067b8' }} />
         <Title level={3} style={{ margin: 0 }}>{t(lang, 'uploadModelTitle')}</Title>
       </Space>
       <Paragraph type="secondary" style={{ marginBottom: 24 }}>
@@ -86,7 +86,7 @@ export default function UploadModelPanel() {
             value={modelName}
             onChange={(e) => setModelName(e.target.value)}
             style={{ marginTop: 8 }}
-            prefix={<SafetyCertificateOutlined style={{ color: '#6366f1' }} />}
+            prefix={<SafetyCertificateOutlined style={{ color: '#0067b8' }} />}
           />
         </div>
 
@@ -101,7 +101,7 @@ export default function UploadModelPanel() {
           disabled={uploading || uploadDone}
         >
           <p className="ant-upload-drag-icon">
-            <InboxOutlined style={{ color: '#6366f1', fontSize: 48 }} />
+            <InboxOutlined style={{ color: '#0067b8', fontSize: 48 }} />
           </p>
           <p className="ant-upload-text">
             {lang === 'zh' ? '点击或拖拽模型文件到此区域上传' : 'Click or drag model file to upload'}

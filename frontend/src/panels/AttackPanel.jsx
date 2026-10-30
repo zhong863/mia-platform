@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react'
 import {
   Typography, Card, Select, InputNumber, Input, Spin, Alert,
-  Tag, Space, Tooltip, Button, Row, Col, Checkbox, Switch,
+  Tooltip, Button, Row, Col, Checkbox, Switch,
 } from 'antd'
-import {
-  PlayCircleOutlined, SafetyCertificateOutlined, ExperimentOutlined,
-  InfoCircleOutlined, AimOutlined,
-} from '@ant-design/icons'
+import { InfoCircleOutlined } from '@ant-design/icons'
 import { fetchAttacks, fetchParams, fetchData, runAttack } from '../api'
 import { LangContext, ThemeContext } from '../context'
 import { t, tAttack, tAttackDescription } from '../i18n'
 import ResultsDisplay from '../components/ResultsDisplay'
 
-const { Title, Paragraph, Text } = Typography
+const { Paragraph, Text } = Typography
 
 export default function AttackPanel({ attackId, initialRun = null }) {
   const { lang } = useContext(LangContext)
@@ -130,8 +127,8 @@ export default function AttackPanel({ attackId, initialRun = null }) {
 
   const cc = isDark ? 'float-card-dark' : 'float-card'
   const cardStyle = {
-    background: isDark ? '#1e1e2e' : '#fff',
-    borderColor: isDark ? '#313244' : '#e8e8e8',
+    background: isDark ? '#1d1d1f' : '#fff',
+    borderColor: isDark ? '#3a3a3c' : '#e8e8e8',
   }
   const canRun = !!getSelectedPath()
   const categoryLabel = attackInfo.category === 'llm'
@@ -164,43 +161,58 @@ export default function AttackPanel({ attackId, initialRun = null }) {
     }
   )
 
+  const cardTitle = (kicker, label) => (
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 10 }}>
+      <span className="p-kicker" style={{ fontSize: 11, letterSpacing: '0.16em' }}>{kicker}</span>
+      <span style={{ fontSize: 16, fontWeight: 600 }}>{label}</span>
+    </span>
+  )
+
   return (
     <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-      <Row gutter={[20, 20]} style={{ marginBottom: 20 }}>
+      {/* 页面头：方法名 + 描述 + 运行按钮 */}
+      <header className="console-head">
+        <span className="p-kicker">{categoryLabel} · {accessLabel}</span>
+        <h1 className="console-title">
+          {tAttack(lang, attackInfo.name, attackInfo.display_name)}
+        </h1>
+        <p className="console-desc">
+          {tAttackDescription(lang, attackInfo.name, attackInfo.description)}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 24, flexWrap: 'wrap' }}>
+          <Button
+            type="primary"
+            onClick={handleRun}
+            loading={loading}
+            disabled={!canRun}
+            size="large"
+            style={{ height: 46, paddingInline: 26, borderRadius: 12, fontWeight: 600 }}
+          >
+            {loading
+              ? lang === 'zh' ? '运行中...' : 'Running...'
+              : lang === 'zh' ? '运行' : 'Run'}
+          </Button>
+          {error && (
+            <Alert
+              message={error}
+              type="error"
+              showIcon
+              closable
+              onClose={() => setError('')}
+              style={{ margin: 0 }}
+            />
+          )}
+        </div>
+      </header>
 
-        {/* 攻击方法说明 */}
-        <Col xs={24} lg={8}>
-          <Card className={cc} style={{ ...cardStyle, height: '100%' }} bodyStyle={{ padding: 20 }}>
-            <Space align="start" size={10} style={{ marginBottom: 12 }}>
-              {attackInfo.category === 'llm'
-                ? <SafetyCertificateOutlined style={{ fontSize: 24, color: '#6366f1' }} />
-                : <ExperimentOutlined style={{ fontSize: 24, color: '#6366f1' }} />}
-              <Title level={4} style={{ margin: 0, lineHeight: 1.3 }}>
-                {tAttack(lang, attackInfo.name, attackInfo.display_name)}
-              </Title>
-            </Space>
-            <Paragraph type="secondary" style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 14 }}>
-              {tAttackDescription(lang, attackInfo.name, attackInfo.description)}
-            </Paragraph>
-            <Space>
-              <Tag color={attackInfo.category === 'llm' ? 'blue' : 'green'}>
-                {categoryLabel}
-              </Tag>
-              <Tag color={attackInfo.access === 'blackbox' ? 'orange' : 'cyan'}>
-                {accessLabel}
-              </Tag>
-            </Space>
-          </Card>
-        </Col>
-
+      <Row gutter={[20, 20]} style={{ marginTop: 28 }}>
         {/* 数据选择：支持 hierarchical 级联和 simple 列表两种结构 */}
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={12}>
           <Card
             className={cc}
-            title={<span style={{ fontSize: 14 }}>📁 {lang === 'zh' ? '数据选择' : 'Data Selection'}</span>}
-            size="small"
+            title={cardTitle('DATA', lang === 'zh' ? '数据选择' : 'Data Selection')}
             style={{ ...cardStyle, height: '100%' }}
-            bodyStyle={{ padding: 16 }}
+            bodyStyle={{ padding: 20 }}
           >
             {dataStructure?.type === 'hierarchical' ? (
               <HierarchicalSelector
@@ -223,7 +235,7 @@ export default function AttackPanel({ attackId, initialRun = null }) {
               </Text>
             )}
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 16 }}>
               <Switch checked={useCache} onChange={setUseCache} size="small" />
               <Tooltip title={t(lang, 'useCacheTooltip')}>
                 <Text style={{ fontSize: 12, cursor: 'help' }}>
@@ -231,41 +243,16 @@ export default function AttackPanel({ attackId, initialRun = null }) {
                 </Text>
               </Tooltip>
             </div>
-            <Button
-              type="primary"
-              icon={<PlayCircleOutlined />}
-              onClick={handleRun}
-              loading={loading}
-              disabled={!canRun}
-              block
-              size="large"
-              style={{ height: 42, marginTop: 12 }}
-            >
-              {loading
-                ? lang === 'zh' ? '运行中...' : 'Running...'
-                : lang === 'zh' ? '运行' : 'Run'}
-            </Button>
-            {error && (
-              <Alert
-                message={error}
-                type="error"
-                showIcon
-                closable
-                onClose={() => setError('')}
-                style={{ marginTop: 12 }}
-              />
-            )}
           </Card>
         </Col>
 
         {/* 参数配置：完全由后端返回的 params 结构驱动 */}
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={12}>
           <Card
             className={cc}
-            title={<span style={{ fontSize: 14 }}>⚙️ {t(lang, 'paramConfig')}</span>}
-            size="small"
+            title={cardTitle('PARAMS', t(lang, 'paramConfig'))}
             style={{ ...cardStyle, height: '100%' }}
-            bodyStyle={{ padding: '12px 16px', maxHeight: 320, overflowY: 'auto' }}
+            bodyStyle={{ padding: '12px 20px', maxHeight: 360, overflowY: 'auto' }}
           >
             {paramEntries.map(([key, val]) => (
               <ParamRow key={key} label={getParamLabel(key, lang)} tooltip={getParamTooltip(key, lang)} isDark={isDark}>
@@ -284,19 +271,21 @@ export default function AttackPanel({ attackId, initialRun = null }) {
 
       {/* 运行中占位 */}
       {loading && (
-        <Card className={cc} style={{ ...cardStyle, textAlign: 'center', padding: 60 }}>
-          <Spin size="large" tip={lang === 'zh' ? '运行中...' : 'Running...'} />
+        <Card className={cc} style={{ ...cardStyle, textAlign: 'center', padding: 60, marginTop: 20 }}>
+          <Spin size="large" />
         </Card>
       )}
 
       {/* 未运行时的引导提示 */}
       {!loading && !result && (
-        <Card className={cc} style={{ ...cardStyle, textAlign: 'center', padding: 60 }}>
-          <AimOutlined style={{ fontSize: 48, color: '#ccc', marginBottom: 16 }} />
-          <Paragraph type="secondary">
+        <Card className={cc} style={{ ...cardStyle, textAlign: 'center', padding: '76px 40px', marginTop: 20 }}>
+          <Paragraph style={{ margin: 0, fontSize: 17, fontWeight: 600, color: 'var(--text)' }}>
+            {lang === 'zh' ? '开始一次隐私评测' : 'Start a privacy evaluation'}
+          </Paragraph>
+          <Paragraph type="secondary" style={{ margin: '10px 0 0', fontSize: 15 }}>
             {lang === 'zh'
-              ? '选择数据和参数，点击运行按钮开始'
-              : 'Select data and params, then click Run'}
+              ? '在上方选择数据与参数，点击「运行」即可得到评测结果。'
+              : 'Select data and parameters above, then click Run to see the results.'}
           </Paragraph>
         </Card>
       )}
@@ -309,7 +298,7 @@ export default function AttackPanel({ attackId, initialRun = null }) {
           message={lang === 'zh'
             ? `已命中实验缓存，直接恢复历史结果（累计命中 ${result.cache_hit_count || 1} 次）。`
             : `Experiment cache hit. Historical result restored (${result.cache_hit_count || 1} cache hits).`}
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 16, marginTop: 20 }}
         />
       )}
       {result && <ResultsDisplay result={result} isDark={isDark} lang={lang} />}
@@ -418,8 +407,8 @@ function ParamRow({ label, tooltip, isDark, children }) {
     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 6 }}>
       <Tooltip title={tooltip}>
         <Text style={{
-          minWidth: 130, maxWidth: 160, flexShrink: 0, fontSize: 12,
-          cursor: 'help', color: isDark ? '#a6adc8' : '#666',
+          minWidth: 130, maxWidth: 160, flexShrink: 0, fontSize: 13,
+          cursor: 'help', color: isDark ? '#98989d' : '#666',
         }}>
           {label} <InfoCircleOutlined style={{ fontSize: 10, color: '#aaa' }} />
         </Text>
@@ -457,7 +446,7 @@ function HierarchicalSelector({ dataStructure, selections, onSelectionChange, la
         return (
           <div key={level.key} style={{ marginBottom: 10 }}>
             <Text style={{
-              fontSize: 12, color: isDark ? '#a6adc8' : '#666',
+              fontSize: 13, color: isDark ? '#98989d' : '#666',
               display: 'block', marginBottom: 4,
             }}>
               {lang === 'zh' ? level.label : level.label_en}
