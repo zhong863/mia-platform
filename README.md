@@ -9,10 +9,24 @@
 ```bash
 conda create -n mia_platform python=3.9
 conda activate mia_platform
-pip install -r requirements.txt
 ```
 
-开发时：前端  npx vite（端口5173）+ 后端 python app.py（端口5000），Vite proxy 转发 API
+### 2. 启动后端（端口 5000）
+
+```bash
+cd backend && pip install -r requirements.txt && python app.py
+```
+
+### 3. 启动前端（端口 5173，Vite proxy 将 `/api` 转发到后端）
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+在浏览器打开 http://localhost:5173 。
+
+> 注意：新克隆的仓库中 `results/` 不存在（未纳入 Git），需先运行预计算脚本生成攻击分数，例如 `backend/attacks/llm_scaling/precompute_*.py`。
+
 部署时：npm run build → 产物复制到 backend/static/ → 只启动 Flask，一个端口搞定
 
 ### 本机 HTTPS 演示地址
