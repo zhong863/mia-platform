@@ -17,6 +17,23 @@ conda activate mia_platform
 cd backend && pip install -r requirements.txt && python app.py
 ```
 
+后端通过以下环境变量配置：
+
+| 变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `MIA_DEBUG` | `false` | 设为 `true` 时开启 Flask 调试模式。后端监听 `0.0.0.0`，调试模式下其他机器也能访问调试器，只应在本机开发时开启。 |
+| `SECRET_KEY` | `mia-demo-secret` | Flask 密钥。未设置时使用不安全的默认值，启动时会打印警告；对外提供服务前请设置为随机字符串。 |
+
+```bash
+# bash
+MIA_DEBUG=true SECRET_KEY=your-random-secret python app.py
+```
+
+```powershell
+# PowerShell
+$env:MIA_DEBUG = "true"; $env:SECRET_KEY = "your-random-secret"; python app.py
+```
+
 ### 3. 启动前端（端口 5173，Vite proxy 将 `/api` 转发到后端）
 
 ```bash
