@@ -1,3 +1,4 @@
+[English](README_EN.md) | 简体中文
 # MIA Attack Demo Platform
 
 成员推断攻击 (Membership Inference Attack) 演示平台。
