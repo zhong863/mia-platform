@@ -7,7 +7,7 @@ Flask 入口
 import os
 from flask import Flask, send_from_directory
 from flask_cors import CORS
-from config import Config
+from config import Config, DEFAULT_SECRET_KEY
 from api.routes import api_bp
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
@@ -55,4 +55,7 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
+    if Config.SECRET_KEY == DEFAULT_SECRET_KEY:
+        print("WARNING: SECRET_KEY is not set, using the insecure default. "
+              "Set the SECRET_KEY environment variable before exposing this server.")
     app.run(host="0.0.0.0", port=5000, debug=Config.DEBUG)

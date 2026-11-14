@@ -14,12 +14,13 @@ import ResultsDisplay from '../components/ResultsDisplay'
 
 const { Title, Paragraph, Text } = Typography
 
-export default function AttackPanel({ attackId, initialRun = null }) {
+export default function AttackPanel({ attackId, initialRun = null, configCache }) {
   const { lang } = useContext(LangContext)
   const { isDark } = useContext(ThemeContext)
 
   const [attackInfo, setAttackInfo] = useState(null)
   const [params, setParams] = useState({})
+  const [defaultParams, setDefaultParams] = useState(null)
   const [dataStructure, setDataStructure] = useState(null)
   const [selections, setSelections] = useState({})
   const [loading, setLoading] = useState(false)
@@ -30,6 +31,7 @@ export default function AttackPanel({ attackId, initialRun = null }) {
 
   /* 初始化：并发请求攻击列表、默认参数、数据结构 */
   useEffect(() => {
+    let active = true
     // This effect intentionally resets local request state when the selected attack changes.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPageLoading(true)
@@ -38,31 +40,35 @@ export default function AttackPanel({ attackId, initialRun = null }) {
     setSelections({})
 
     Promise.all([fetchAttacks(), fetchParams(attackId), fetchData(attackId)])
-      .then(([attacks, defaultParams, data]) => {
+      .then(([attacks, defaults, data]) => {
+        if (!active) return
+        const savedConfig = configCache?.current.get(attackId)
         setAttackInfo(attacks.find((a) => a.name === attackId))
-        setParams(initialRun?.params || defaultParams)
+        setDefaultParams(defaults)
+        setParams(initialRun ? (initialRun.params || defaults) : (savedConfig?.params || defaults))
+        setUseCache(initialRun ? true : (savedConfig?.useCache ?? true))
         setDataStructure(data)
 
         const restoredSelections = initialRun
           ? getSelectionsForDataPath(data, initialRun.data_path)
-          : null
-
-        if (restoredSelections) {
-          setSelections(restoredSelections)
-        // 根据数据结构类型自动选中第一项，减少用户操作
-        } else if (data.type === 'hierarchical' && data.levels?.length > 0) {
-          autoSelectFirst(data, {}, setSelections)
-        } else if (data.type === 'simple' && data.data?.length > 0) {
-          setSelections({ path: data.data[0].path })
-        }
+          : getAvailableSelections(data, savedConfig?.selections)
+        setSelections(restoredSelections || getDefaultSelections(data))
 
         if (initialRun?.result) {
           setResult(initialRun.result)
         }
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setPageLoading(false))
-  }, [attackId, initialRun])
+      .catch((err) => { if (active) setError(err.message) })
+      .finally(() => { if (active) setPageLoading(false) })
+
+    return () => { active = false }
+  }, [attackId, initialRun, configCache])
+
+  // The dashboard owns this cache so drafts survive panel unmounts.
+  useEffect(() => {
+    if (pageLoading || !defaultParams) return
+    configCache?.current.set(attackId, { params, selections, useCache })
+  }, [attackId, configCache, defaultParams, pageLoading, params, selections, useCache])
 
   /* 切换数据集时，将数据项附带的只读字段（如 encoding）同步到参数 */
   useEffect(() => {
@@ -98,6 +104,14 @@ export default function AttackPanel({ attackId, initialRun = null }) {
     for (let i = levelIndex + 1; i < levels.length; i++) delete next[levels[i].key]
     const completed = autoSelectSubsequent(dataStructure, next, levelIndex + 1)
     setSelections(completed)
+  }
+
+  const handleReset = () => {
+    setParams(defaultParams)
+    setSelections(getDefaultSelections(dataStructure))
+    setUseCache(true)
+    setError('')
+    setResult(null)
   }
 
   const handleRun = async () => {
@@ -263,6 +277,11 @@ export default function AttackPanel({ attackId, initialRun = null }) {
           <Card
             className={cc}
             title={<span style={{ fontSize: 14 }}>⚙️ {t(lang, 'paramConfig')}</span>}
+            extra={(
+              <Button size="small" onClick={handleReset} disabled={loading}>
+                {lang === 'zh' ? '重置为默认配置' : 'Reset to Defaults'}
+              </Button>
+            )}
             size="small"
             style={{ ...cardStyle, height: '100%' }}
             bodyStyle={{ padding: '12px 16px', maxHeight: 320, overflowY: 'auto' }}
@@ -524,15 +543,29 @@ function getSelectionsForDataPath(dataStructure, loggedPath) {
   return null
 }
 
+function getAvailableSelections(dataStructure, selections) {
+  if (!selections) return null
+  if (dataStructure.type === 'simple') {
+    return dataStructure.data?.some((item) => item.path === selections.path) ? selections : null
+  }
+  if (dataStructure.type === 'hierarchical') {
+    const key = dataStructure.levels.map((level) => selections[level.key]).join('/')
+    return dataStructure.data.paths?.[key] ? selections : null
+  }
+  return null
+}
+
 /* ================================================================
    自动选中第一项（页面初始化时调用）
    按层级顺序逐级取第一个可选值
    ================================================================ */
-function autoSelectFirst(ds, cur, set) {
+function getDefaultSelections(ds) {
+  if (ds?.type === 'simple') return ds.data?.length ? { path: ds.data[0].path } : {}
+  if (ds?.type !== 'hierarchical' || !ds.levels?.length) return {}
   const { levels, data } = ds
-  const s = { ...cur }
+  const s = {}
 
-  if (!data.models?.length) { set(s); return }
+  if (!data.models?.length) return s
   s[levels[0].key] = data.models[0]
 
   if (levels.length > 1 && data.datasets?.[data.models[0]]?.length > 0) {
@@ -556,7 +589,7 @@ function autoSelectFirst(ds, cur, set) {
     }
   }
 
-  set(s)
+  return s
 }
 
 /* ================================================================

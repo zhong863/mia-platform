@@ -4,6 +4,7 @@ English | [简体中文](README.md)
 
 A demo platform for Membership Inference Attacks (MIA).
 
+
 ## Screenshots
 
 | Home page | Home page (features) |
@@ -15,6 +16,7 @@ A demo platform for Membership Inference Attacks (MIA).
 |:---:|:---:|
 | ![Home page, more](docs/Englishimages/Homepage3.png) | ![Attack console](docs/Englishimages/Consolepage1.png) |
 | *Additional home page sections* | *Select a model, dataset and parameters, then run an attack* |
+
 
 ## Quick Start
 
@@ -49,4 +51,8 @@ Open `https://mia-platform` in your browser. The demo server uses the default HT
 
 ## License
 
+
 The project code is open-sourced under the [MIT License](https://github.com/zhong863/mia-platform/blob/main/LICENSE). Third-party dependencies, models and datasets used by the project remain subject to their own licenses and terms of use.
+=======
+The project code is open-sourced under the [MIT License](LICENSE). Third-party dependencies, models and datasets used by the project remain subject to their own licenses and terms of use.
+

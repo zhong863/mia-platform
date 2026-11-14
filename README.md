@@ -23,10 +23,41 @@
 ```bash
 conda create -n mia_platform python=3.9
 conda activate mia_platform
-pip install -r requirements.txt
 ```
 
-开发时：前端  npx vite（端口5173）+ 后端 python app.py（端口5000），Vite proxy 转发 API
+### 2. 启动后端（端口 5000）
+
+```bash
+cd backend && pip install -r requirements.txt && python app.py
+```
+
+后端通过以下环境变量配置：
+
+| 变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `MIA_DEBUG` | `false` | 设为 `true` 时开启 Flask 调试模式。后端监听 `0.0.0.0`，调试模式下其他机器也能访问调试器，只应在本机开发时开启。 |
+| `SECRET_KEY` | `mia-demo-secret` | Flask 密钥。未设置时使用不安全的默认值，启动时会打印警告；对外提供服务前请设置为随机字符串。 |
+
+```bash
+# bash
+MIA_DEBUG=true SECRET_KEY=your-random-secret python app.py
+```
+
+```powershell
+# PowerShell
+$env:MIA_DEBUG = "true"; $env:SECRET_KEY = "your-random-secret"; python app.py
+```
+
+### 3. 启动前端（端口 5173，Vite proxy 将 `/api` 转发到后端）
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+在浏览器打开 http://localhost:5173 。
+
+> 注意：新克隆的仓库中 `results/` 不存在（未纳入 Git），需先运行预计算脚本生成攻击分数，例如 `backend/attacks/llm_scaling/precompute_*.py`。
+
 部署时：npm run build → 产物复制到 backend/static/ → 只启动 Flask，一个端口搞定
 
 ### 本机 HTTPS 演示地址
