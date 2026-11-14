@@ -1,7 +1,20 @@
 [English](README_EN.md) | 简体中文
+
 # MIA Attack Demo Platform
 
 成员推断攻击 (Membership Inference Attack) 演示平台。
+
+## 截图
+
+| 首页 | 首页（功能） |
+|:---:|:---:|
+| ![首页](docs/Englishimages/Homepage1.png) | ![首页（续）](docs/Englishimages/Homepage2.png) |
+| *平台概览与入口* | *可用的攻击方法与功能* |
+
+| 首页（更多） | 攻击控制台 |
+|:---:|:---:|
+| ![首页（更多）](docs/Englishimages/Homepage3.png) | ![攻击控制台](docs/Englishimages/Consolepage1.png) |
+| *首页的其他部分* | *选择模型、数据集和参数，然后运行攻击* |
 
 ## 快速开始
 
