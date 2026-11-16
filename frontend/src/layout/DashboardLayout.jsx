@@ -9,10 +9,11 @@ import {
   UserOutlined, LockOutlined, UnlockOutlined,
   FileTextOutlined, PictureOutlined, SettingOutlined,
   MenuFoldOutlined, MenuUnfoldOutlined, SafetyCertificateOutlined,
-  HistoryOutlined,
+  HistoryOutlined, LoadingOutlined, ExclamationCircleOutlined,
 } from '@ant-design/icons'
 import { ThemeContext, LangContext } from '../context'
 import { t, tAttack } from '../i18n'
+import { fetchAttacks } from '../api'
 
 import AttackPanel from '../panels/AttackPanel'
 import UploadModelPanel from '../panels/UploadModelPanel'
@@ -32,6 +33,42 @@ const MIN_SIDER_WIDTH = 220
 const MAX_SIDER_WIDTH = 420
 const SIDER_WIDTH_STORAGE_KEY = 'mia-platform-sider-width'
 
+// 侧边栏分组：category → 图标 / 文案 key；未知 category 直接用其名称作为分组
+const CATEGORY_GROUPS = {
+  llm: { icon: <FileTextOutlined />, labelKey: 'llmMethods' },
+  vlm: { icon: <PictureOutlined />, labelKey: 'vlmAttacks' },
+}
+const ACCESS_GROUPS = [
+  { access: 'blackbox', icon: <LockOutlined />, labelKey: 'blackbox' },
+  { access: 'whitebox', icon: <UnlockOutlined />, labelKey: 'whitebox' },
+]
+
+// 根据 /api/attacks 返回的列表生成「隐私检测方法」下的菜单，保持注册顺序
+function buildMethodItems(attacks, lang) {
+  const categories = [...new Set(['llm', 'vlm', ...attacks.map((a) => a.category)])]
+  const toItem = (a) => ({ key: `attack:${a.name}`, label: tAttack(lang, a.name, a.display_name) })
+  return categories.map((category) => {
+    const inCategory = attacks.filter((a) => a.category === category)
+    const accessGroups = ACCESS_GROUPS.map(({ access, icon, labelKey }) => ({
+      key: `${category}-${access}`,
+      icon,
+      label: t(lang, labelKey),
+      children: inCategory.filter((a) => a.access === access).map(toItem),
+    })).filter((group) => group.children.length > 0)
+    // access 不是 blackbox / whitebox 的攻击直接挂在分组下
+    const ungrouped = inCategory
+      .filter((a) => !ACCESS_GROUPS.some((g) => g.access === a.access))
+      .map(toItem)
+    const group = CATEGORY_GROUPS[category]
+    return {
+      key: category,
+      icon: group?.icon ?? <SafetyCertificateOutlined />,
+      label: group ? t(lang, group.labelKey) : category,
+      children: [...accessGroups, ...ungrouped],
+    }
+  }).filter((group) => group.children.length > 0)
+}
+
 export default function DashboardLayout() {
   const { isDark, setIsDark } = useContext(ThemeContext)
   const { lang, setLang } = useContext(LangContext)
@@ -48,12 +85,20 @@ export default function DashboardLayout() {
   const [guideOpen, setGuideOpen] = useState(false)
   const [restoredRun, setRestoredRun] = useState(null)
   const attackConfigCache = useRef(new Map())
+  const [attacks, setAttacks] = useState(null)
+  const [attacksError, setAttacksError] = useState(false)
 
   const siderW = collapsed ? SIDER_COLLAPSED : sidebarWidth
 
   useEffect(() => {
     window.localStorage.setItem(SIDER_WIDTH_STORAGE_KEY, String(sidebarWidth))
   }, [sidebarWidth])
+
+  useEffect(() => {
+    fetchAttacks()
+      .then(setAttacks)
+      .catch(() => setAttacksError(true))
+  }, [])
 
   useEffect(() => {
     if (!isResizingSider) return undefined
@@ -84,76 +129,17 @@ export default function DashboardLayout() {
       key: 'methods',
       icon: <SafetyCertificateOutlined />,
       label: t(lang, 'existingMethods'),
-      children: [
-        {
-          key: 'llm',
-          icon: <FileTextOutlined />,
-          label: t(lang, 'llmMethods'),
-          children: [
-            {
-              key: 'llm-blackbox',
-              icon: <LockOutlined />,
-              label: t(lang, 'blackbox'),
-              children: [
-                {
-                  key: 'attack:llm_scaling_collection',
-                  label: tAttack(lang, 'llm_scaling_collection', 'Scaling Up — Collection'),
-                },
-                {
-                  key: 'attack:llm_scaling_document',
-                  label: tAttack(lang, 'llm_scaling_document', 'Scaling Up — Document'),
-                },
-                {
-                  key: 'attack:llm_window_based_comparison',
-                  label: tAttack(lang, 'llm_window_based_comparison', 'Window-Based Comparison Attack'),
-                },
-                {
-                  key: 'attack:llm_subset_aggregated_membership',
-                  label: tAttack(lang, 'llm_subset_aggregated_membership', 'Subset-Aggregated Membership Attack'),
-                },
-                {
-                  key: 'attack:llm_tabular_membership',
-                  label: tAttack(lang, 'llm_tabular_membership', 'Tabular Membership Inference Attack'),
-                },
-              ],
-            },
-            {
-              key: 'llm-whitebox',
-              icon: <UnlockOutlined />,
-              label: t(lang, 'whitebox'),
-              children: [
-                {
-                  key: 'attack:llm_scaling_whitebox',
-                  label: tAttack(lang, 'llm_scaling_whitebox', 'Scaling Up — Whitebox Enhanced'),
-                },
-              ],
-            },
-          ],
-        },
-        {
-          key: 'vlm',
-          icon: <PictureOutlined />,
-          label: t(lang, 'vlmAttacks'),
-          children: [
-            { key: 'vlm-blackbox', 
-              icon: <LockOutlined />,
-              label: t(lang, 'blackbox'),
-              children:[{ key: 'attack:vlm_reference_inference_attack', label: tAttack(lang, 'vlm_reference_inference_attack', 'Reference Non_member Inference') }]
-              },
-            {
-              key: 'vlm-whitebox',
-              icon: <UnlockOutlined />,
-              label: t(lang, 'whitebox'),
-              children: [
-                {
-                  key: 'attack:resnet_lira_whitebox',
-                  label: tAttack(lang, 'resnet_lira_whitebox', 'ResNet-18 LiRA White-Box Attack'),
-                },
-              ],
-            },
-          ],
-        },
-      ],
+      children: attacksError
+        ? [{
+            key: 'methods-error',
+            icon: <ExclamationCircleOutlined />,
+            label: t(lang, 'attacksLoadError'),
+            disabled: true,
+            danger: true,
+          }]
+        : attacks
+          ? buildMethodItems(attacks, lang)
+          : [{ key: 'methods-loading', icon: <LoadingOutlined />, label: t(lang, 'attacksLoading'), disabled: true }],
     },
     {
       key: 'upload',

@@ -13,6 +13,8 @@ const messages = {
     vlmAttacks: '视觉模型',
     blackbox: '黑盒检测',
     whitebox: '白盒检测',
+    attacksLoading: '加载中…',
+    attacksLoadError: '攻击列表加载失败',
 
     uploadSection: '上传与检测',
     uploadModel: '上传模型',
@@ -75,6 +77,8 @@ const messages = {
     vlmAttacks: 'VLM Vision Model',
     blackbox: 'Black-box',
     whitebox: 'White-box',
+    attacksLoading: 'Loading…',
+    attacksLoadError: 'Failed to load attacks',
 
     uploadSection: 'Upload & Detect',
     uploadModel: 'Upload Model',
@@ -127,7 +131,7 @@ const messages = {
 /**
  * 攻击方法名称的中英文映射
  * key 对应后端 attack.name 字段
- * 新增攻击方法时在这里加一行即可，前端侧边栏自动生效
+ * 侧边栏由 /api/attacks 自动生成；在这里加一行可提供中英文名称
  * 查不到时回退到后端返回的 display_name
  */
 export const attackNames = {
