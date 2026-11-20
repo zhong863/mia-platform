@@ -81,7 +81,7 @@ export default function DashboardLayout() {
       : DEFAULT_SIDER_WIDTH
   })
   const [isResizingSider, setIsResizingSider] = useState(false)
-  const [activePanel, setActivePanel] = useState('attack:llm_scaling_collection')
+  const [activePanel, setActivePanel] = useState('panel:project_overview')
   const [guideOpen, setGuideOpen] = useState(false)
   const [restoredRun, setRestoredRun] = useState(null)
   const attackConfigCache = useRef(new Map())
@@ -165,6 +165,11 @@ export default function DashboardLayout() {
     setActivePanel('attack:llm_scaling_collection')
   }
 
+  const navigate = (panelKey) => {
+    setRestoredRun(null)
+    setActivePanel(panelKey)
+  }
+
   const openLoggedRun = (run) => {
     setRestoredRun(run)
     setActivePanel(`attack:${run.attack_id}`)
@@ -187,8 +192,8 @@ export default function DashboardLayout() {
     }
     switch (activePanel) {
       case 'panel:project_overview':
-        return <ProjectOverviewPanel lang={lang} isDark={isDark}
-          onEnterConsole={openConsole} />
+        return <ProjectOverviewPanel lang={lang}
+          onEnterConsole={openConsole} onNavigate={navigate} />
       case 'panel:run_logs': return <RunLogPanel onOpenRun={openLoggedRun} />
       case 'panel:upload_model': return <UploadModelPanel />
       case 'panel:upload_dataset': return <UploadDatasetPanel />
@@ -198,11 +203,11 @@ export default function DashboardLayout() {
     }
   }
 
-  const bgSider = isDark ? '#1e1e2e' : '#fff'
-  const bgHeader = isDark ? '#1e1e2e' : '#fff'
-  const bgContent = isDark ? '#11111b' : '#f0f2f5'
-  const borderC = isDark ? '#313244' : '#e8e8e8'
-  const textC = isDark ? '#cdd6f4' : '#1e293b'
+  const bgSider = 'var(--bg-surface)'
+  const bgHeader = 'var(--bg-surface)'
+  const bgContent = 'var(--bg-layout)'
+  const borderC = 'var(--border)'
+  const textC = 'var(--text)'
 
   return (
     <Layout style={{ minHeight: '100vh', background: bgContent }}>
@@ -242,22 +247,19 @@ export default function DashboardLayout() {
               width: 38,
               height: 38,
               borderRadius: 10,
-              background: 'linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa)',
+              background: 'var(--brand)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.35)',
               flexShrink: 0,
             }}>
-              <SafetyCertificateOutlined style={{ fontSize: 20, color: '#fff' }} />
+              <SafetyCertificateOutlined style={{ fontSize: 20, color: 'var(--on-brand)' }} />
             </div>
             {!collapsed && (
               <span style={{
                 fontSize: 18,
                 fontWeight: 800,
-                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'var(--text)',
                 whiteSpace: 'nowrap',
                 letterSpacing: 0.5,
               }}>
@@ -268,17 +270,17 @@ export default function DashboardLayout() {
           {!collapsed && (
             <Button type="text" size="small" icon={<MenuFoldOutlined />}
               onClick={() => setCollapsed(true)}
-              style={{ color: isDark ? '#6c7086' : '#999', fontSize: 15 }} />
+              style={{ color: isDark ? '#9A9AA3' : '#6C6C75', fontSize: 15 }} />
           )}
           {collapsed && (
             <Button type="text" size="small" icon={<MenuUnfoldOutlined />}
               onClick={() => setCollapsed(false)}
-              style={{ color: isDark ? '#6c7086' : '#999', fontSize: 15, marginTop: 4 }} />
+              style={{ color: isDark ? '#9A9AA3' : '#6C6C75', fontSize: 15, marginTop: 4 }} />
           )}
         </div>
 
         <Menu
-          key={lang}          
+          key={lang}
           mode="inline"
           selectedKeys={[activePanel]}
           defaultOpenKeys={collapsed ? [] : ['methods', 'llm', 'llm-blackbox']}
@@ -314,7 +316,7 @@ export default function DashboardLayout() {
             width: 1,
             height: '100%',
             margin: '0 auto',
-            background: isResizingSider ? '#4f46e5' : 'transparent',
+            background: isResizingSider ? 'var(--brand)' : 'transparent',
             transition: 'background 0.15s',
           }} />
         </div>
@@ -347,7 +349,7 @@ export default function DashboardLayout() {
               icon={<HomeOutlined style={{ fontSize: 17 }} />}
               onClick={() => { setRestoredRun(null); setActivePanel('panel:project_overview') }}
               style={{
-                color: activePanel === 'panel:project_overview' ? '#4f46e5' : textC,
+                color: activePanel === 'panel:project_overview' ? 'var(--brand)' : textC,
                 fontWeight: activePanel === 'panel:project_overview' ? 600 : 400,
                 fontSize: 15,
                 height: 40,
@@ -355,25 +357,25 @@ export default function DashboardLayout() {
             >
               {t(lang, 'home')}
             </Button>
-            <span style={{ color: isDark ? '#45475a' : '#d9d9d9', fontSize: 16 }}>/</span>
+            <span style={{ color: isDark ? '#34343A' : '#DBDBE0', fontSize: 16 }}>/</span>
             <Button type="text"
               icon={<DashboardOutlined style={{ fontSize: 17 }} />}
               onClick={openConsole}
               style={{
-                color: activePanel.startsWith('attack:') ? '#4f46e5' : textC,
+                color: activePanel.startsWith('attack:') ? 'var(--brand)' : textC,
                 fontWeight: activePanel.startsWith('attack:') ? 600 : 400,
                 fontSize: 15,
                 height: 40,
               }}>
               {t(lang, 'console')}
             </Button>
-            <span style={{ color: isDark ? '#45475a' : '#d9d9d9', fontSize: 16 }}>/</span>
+            <span style={{ color: isDark ? '#34343A' : '#DBDBE0', fontSize: 16 }}>/</span>
             <Button
               type="text"
               icon={<HistoryOutlined style={{ fontSize: 17 }} />}
               onClick={() => setActivePanel('panel:run_logs')}
               style={{
-                color: activePanel === 'panel:run_logs' ? '#4f46e5' : textC,
+                color: activePanel === 'panel:run_logs' ? 'var(--brand)' : textC,
                 fontWeight: activePanel === 'panel:run_logs' ? 600 : 400,
                 fontSize: 15,
                 height: 40,
@@ -387,25 +389,25 @@ export default function DashboardLayout() {
             <Tooltip title={t(lang, 'guide')}>
               <Button type="text" icon={<QuestionCircleOutlined style={{ fontSize: 18 }} />}
                 onClick={() => setGuideOpen(true)}
-                style={{ color: isDark ? '#cdd6f4' : '#555', width: 40, height: 40 }} />
+                style={{ color: isDark ? '#ECECEF' : '#6C6C75', width: 40, height: 40 }} />
             </Tooltip>
             <Tooltip title={isDark ? 'Light Mode' : 'Dark Mode'}>
               <Button type="text"
                 icon={isDark ? <SunOutlined style={{ fontSize: 18 }} /> : <MoonOutlined style={{ fontSize: 18 }} />}
                 onClick={() => setIsDark(!isDark)}
-                style={{ color: isDark ? '#f9e2af' : '#555', width: 40, height: 40 }} />
+                style={{ color: isDark ? '#D9BA7E' : '#6C6C75', width: 40, height: 40 }} />
             </Tooltip>
             <Tooltip title={t(lang, 'switchLang')}>
               <Button type="text" icon={<TranslationOutlined style={{ fontSize: 18 }} />}
                 onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-                style={{ color: isDark ? '#cdd6f4' : '#555', height: 40, fontSize: 14 }}>
+                style={{ color: isDark ? '#ECECEF' : '#6C6C75', height: 40, fontSize: 14 }}>
                 {lang === 'zh' ? 'EN' : '中'}
               </Button>
             </Tooltip>
             <Dropdown menu={{ items: userMenuItems, onClick: handleUserMenu }} placement="bottomRight">
-              <Avatar icon={<UserOutlined />}
+              <Avatar icon={<UserOutlined style={{ color: 'var(--on-brand)' }} />}
                 size={36}
-                style={{ background: '#4f46e5', cursor: 'pointer', marginLeft: 8 }} />
+                style={{ background: 'var(--brand)', cursor: 'pointer', marginLeft: 8 }} />
             </Dropdown>
           </Space>
         </Header>
